@@ -2,11 +2,10 @@
 //Talha Muhammad, Saif Siraj
 //https://api.nasa.gov/neo/rest/v1/feed?start_date=2016-02-07&end_date=2016-02-14&detailed=false&api_key=aQrVloEcD9iUyUxAuWup8KodIyE0RyeLQNZQmUjx
 
-// getter for data so we can put this at the bottom
-getData = () =>
-{
 
-    return {
+
+const getData =
+    {
         "links": {
             "next": "https://api.nasa.gov/neo/rest/v1/feed?start_date=2016-02-14&end_date=2016-02-21&detailed=false&api_key=aQrVloEcD9iUyUxAuWup8KodIyE0RyeLQNZQmUjx",
             "prev": "https://api.nasa.gov/neo/rest/v1/feed?start_date=2016-01-31&end_date=2016-02-07&detailed=false&api_key=aQrVloEcD9iUyUxAuWup8KodIyE0RyeLQNZQmUjx",
@@ -4324,4 +4323,13 @@ getData = () =>
             }]
         }
     }
-};
+
+class nearearthobjects {
+
+
+
+}
+console.log(getData)
+var objects = getData.near_earth_objects;
+for(var objs in objects)
+console.log(getData.near_earth_objects['2016-02-07']);
