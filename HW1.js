@@ -4336,7 +4336,6 @@ class nearearthobjects {
        this.orbit = orbit;
     }
 }
-var myMap = new Map();
 var objects = getData.near_earth_objects;
 var i = 0;
 var arr = new Array();
@@ -4358,17 +4357,19 @@ for(var x in objects){
 
 }
 //average distance in miles of near misses between 02/07/2016 and 02/14/2016
-function avg(arry){
+avg = (arry) =>{
     let num = 0;
     for(var x of arry){
         num += parseInt(x.distance);
+
     }
-    return((num / arry.length) + " miles");
+
+    return`${num / arry.length} miles`;
 
 }
 
 //closest and name
-function closest(arry){
+closest = (arry) => {
     let num = arry[0];
     for(var x of arry){
         if(parseInt(x.distance) < parseInt(num.distance)){
@@ -4376,11 +4377,11 @@ function closest(arry){
         }
     }
 
-    return num.distance+ " miles - " +num.name;
+    return `${num.distance} miles - ${num.name}`;
 
 }
 
-function hazardcount(arry){
+hazardcount = (arry) =>{
     let num = 0;
     for(var x of arry){
 
@@ -4390,14 +4391,14 @@ function hazardcount(arry){
     }
     return num;
 }
-function maxdiam(arry){
+maxdiam = (arry) =>{
     let num = arry[0];
     for(var x of arry){
         if(parseInt(x.diameter.estimated_diameter_max) > parseInt(num.diameter.estimated_diameter_max)){
             num = x;
         }
     }
-    return num.diameter.estimated_diameter_max + " miles - " + num.name;
+    return `${num.diameter.estimated_diameter_max} miles - ${num.name}`;
 
 }
 
