@@ -3,7 +3,6 @@
 //https://api.nasa.gov/neo/rest/v1/feed?start_date=2016-02-07&end_date=2016-02-14&detailed=false&api_key=aQrVloEcD9iUyUxAuWup8KodIyE0RyeLQNZQmUjx
 
 
-
 const getData =
     {
         "links": {
@@ -4322,101 +4321,167 @@ const getData =
                 }]
             }]
         }
-    }
+    };
 
 class nearearthobjects {
-    constructor(name, magnitude, diameter_feet, hazard, date, velocity, distance_miles, orbit){
-       this.name = name;
-       this.magnitude = magnitude;
-       this.diameter = diameter_feet;
-       this.hazard = hazard;
-       this.date = date;
-       this.velocity = velocity;
-       this.distance = distance_miles;
-       this.orbit = orbit;
+    constructor(name, magnitude, diameter_feet, hazard, date, velocity, distance_miles, orbit) {
+        this.name = name;
+        this.magnitude = magnitude;
+        this.diameter = diameter_feet;
+        this.hazard = hazard;
+        this.date = date;
+        this.velocity = velocity;
+        this.distance = distance_miles;
+        this.orbit = orbit;
     }
 }
+
+defaultarr = [new nearearthobjects(null, null, null, null, null, null, null, null)]
 var objects = getData.near_earth_objects;
 var i = 0;
 var arr = new Array();
-for(var x in objects){
+for (var x in objects) {
 
 
-        let mainobj = objects[x];
-
-        for(var y in mainobj){
-            let objs = mainobj[y]
-            let dia = objs.estimated_diameter;
-            let close = objs.close_approach_data[0];
-            arr[i] = new nearearthobjects(objs.name, objs.absolute_magnitude_h, dia.feet, objs.is_potentially_hazardous_asteroid,
-                close.close_approach_date, close.relative_velocity, close.miss_distance.miles, close.orbiting_body);
-            i++;
-
-        }
-
-
+    let mainobj = objects[x];
+    for (var y in mainobj) {
+        let objs = mainobj[y]
+        let dia = objs.estimated_diameter;
+        let close = objs.close_approach_data[0];
+        arr[i] = new nearearthobjects(objs.name, objs.absolute_magnitude_h, dia.feet, objs.is_potentially_hazardous_asteroid,
+            close.close_approach_date, close.relative_velocity, close.miss_distance.miles, close.orbiting_body);
+        i++;
+    }
 }
-//average distance in miles of near misses between 02/07/2016 and 02/14/2016
-avg = (arry) =>{
+avg = (arry = defaultarr) => {
     let num = 0;
-    for(var x of arry){
+    for (var x of arry) {
         num += parseInt(x.distance);
 
     }
 
-    return`${num / arry.length} miles`;
+    return `${num / arry.length} miles`;
 
-}
+};
 
-//closest and name
-closest = (arry) => {
+closest = (arry = defaultarr) => {
     let num = arry[0];
-    for(var x of arry){
-        if(parseInt(x.distance) < parseInt(num.distance)){
+    for (var x of arry) {
+        if (parseInt(x.distance) < parseInt(num.distance)) {
             num = x;
         }
     }
 
     return `${num.distance} miles - ${num.name}`;
 
-}
+};
 
-hazardcount = (arry) =>{
+hazardcount = (arry = defaultarr) => {
     let num = 0;
-    for(var x of arry){
+    for (var x of arry) {
 
-        if(x.hazard){
+        if (x.hazard) {
             num++;
         }
     }
     return num;
 }
-maxdiam = (arry) =>{
+maxdiam = (arry = defaultarr) => {
     let num = arry[0];
-    for(var x of arry){
-        if(parseInt(x.diameter.estimated_diameter_max) > parseInt(num.diameter.estimated_diameter_max)){
+    for (var x of arry) {
+        if (parseInt(x.diameter.estimated_diameter_max) > parseInt(num.diameter.estimated_diameter_max)) {
             num = x;
         }
     }
     return `${num.diameter.estimated_diameter_max} miles - ${num.name}`;
 
-}
+};
 
+mostmisses = (arry = defaultarr) => {
+    let count = {};
+    let max = {};
+    arry.map((x) => {
+        let extracteddate = x.date;
+        if (count[extracteddate] === undefined) {
+            count[extracteddate] = 1
+        } else {
+            count[extracteddate] = count[extracteddate] + 1
+        }
+    });
+    for (date in count) {
+        if (Object.keys(max).length === 0) {
+            max[date] = count[date]
+        } else if (count[date] > max[Object.keys(max)[0]]) {
+            max = {};
+            max[date] = count[date]
+        }
+    }
+    return `${max[Object.keys(max)[0]]} near misses on ${Object.keys(max)[0]}`
+};
 
+leastmisses = (arry = defaultarr) => {
+    let count = {};
+    let min = {};
+    arry.map((x) => {
+        let {date: extracteddate} = x;
+        if (count[extracteddate] === undefined) {
+            count[extracteddate] = 1
+        } else {
+            count[extracteddate] = count[extracteddate] + 1
+        }
+    });
+    for (date in count) {
+        if (Object.keys(min).length === 0) {
+            min[date] = count[date]
+        } else if (count[date] < min[Object.keys(min)[0]]) {
+            min = {};
+            min[date] = count[date]
+        }
+    }
+    return `${min[Object.keys(min)[0]]} near misses on ${Object.keys(min)[0]}`
+};
 
+fastestspeed = (arry = defaultarr) => {
+    let set = new Set();
+    let fastest = {};
+    arry.map((x) => {
+        let {name, velocity: {miles_per_hour: speed}} = x;
+        set.add({name: name, speed: speed})
+    });
+    for (let x of set) {
+        if (Object.keys(fastest).length === 0) {
+            fastest = x;
+        } else if (parseFloat(fastest.speed) < parseFloat(x.speed)) {
+            fastest = x;
+        }
+    }
+    return `${fastest.name} with a speed of ${fastest.speed}`
+};
 
-
-
-console.log("What is the average distance in miles of near misses between 02-07-16 and 02-14-16? " + avg(arr));
+slowestspeed = (arry = defaultarr) => {
+    let set = new Set();
+    let slowest = {};
+    arry.map((x) => {
+        let {name, velocity: {miles_per_hour: speed}} = x;
+        set.add({name: name, speed: speed})
+    });
+    for (let x of set) {
+        if (Object.keys(slowest).length === 0) {
+            slowest = x;
+        } else if (parseFloat(slowest.speed) > parseFloat(x.speed)) {
+            slowest = x;
+        }
+    }
+    return `${slowest.name} with a speed of ${slowest.speed}`
+};
+console.log("What is the average distance in miles of near misses between 02-07-16 and 02-14-16? \n" + avg(arr));
 console.log("What is the closest (in miles) an asteroid came to earth between 02-07-16 and 02-14-16 and what is its " +
-    "name? " + closest(arr));
-console.log("How many asteroids that near missed earth between 02-07-16 and 02-14-16 were potentially hazardous? " +
+    "name? \n" + closest(arr));
+console.log("How many asteroids that near missed earth between 02-07-16 and 02-14-16 were potentially hazardous? \n" +
     hazardcount(arr));
 console.log("What is the largest max diameter of an asteroid that near missed earth between 02-07-16 and 02-14-16" +
-    " and what is it's name? " + maxdiam(arr))
-
-
-//average distance in miles of near misses between 02/07/2016 and 02/14/2016
-
-
-//le.log(getData.near_earth_objects['2016-02-07']);
+    " and what is it's name? \n" + maxdiam(arr));
+console.log("Which day between 02-07-16 and 02-14-16 had the most near misses? \n" + mostmisses(arr));
+console.log("Which day between 02-07-16 and 02-14-16 had the least near misses? \n" + leastmisses(arr));
+console.log("What was the fastest speed of an asteroid that near missed earth between 02-07-16 and 02-14-16 and what is its name? \n" + fastestspeed(arr));
+console.log("What was the slowest speed of an asteroid that near missed earth between 02-07-16 and 02-14-16 and what is its name? \n" + slowestspeed(arr));
